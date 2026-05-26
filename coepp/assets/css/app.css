@@ -1,0 +1,334 @@
+/* ===========================
+   RESET & TOKENS
+   - Reset básico e tokens de design (CSS variables) para tema e espaçamentos.
+   - Facilita troca de cores/medidas centralmente.
+=========================== */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root{
+  /* Alturas e larguras estruturais */
+  --topbar-h: 64px;
+  --sidebar-w: 200px;     /* largura padrão da sidebar (modo normal) */
+
+  /* Paleta */
+  --bg: #f5f6fa;
+  --surface:#ffffff;
+  --border:#e5e7eb;
+  --ink:#1f2937;
+  --muted:#6b7280;
+  --brand:#0a4ea1;        /* azul base (FSA aproximado) */
+  --brand-ink:#0d3b7a;    /* azul mais escuro para títulos/ativos */
+  --brand-soft:#ecf3ff;   /* fundo suave para estados ativos */
+  --hover:#f3f4f6;
+
+  /* Elevation e cantos */
+  --shadow: 0 8px 24px rgba(0,0,0,.06);
+  --radius:14px;
+}
+
+html, body { height:100%; }
+body{
+  /* Tipografia e suavização de fontes para melhor legibilidade */
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===========================
+   TOPBAR
+   - Barra fixa no topo com 3 colunas (esq/centro/dir).
+   - Z-index alto para sobrepor conteúdo.
+=========================== */
+.topbar {
+  position: fixed;
+  top:0; left:0;
+  height: var(--topbar-h);
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* esquerda - centro - direita */
+  align-items: center;
+  padding: 0 16px;
+  z-index: 1000;
+}
+
+.topbar__left {
+  display: flex;
+  align-items: center;
+}
+.topbar__center { text-align: center; }
+.topbar__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--brand-ink);
+}
+.topbar__right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* ===========================
+   USER MENU
+   - Dropdown simples visível no hover.
+   - Em produção, considere controlar via JS para acessibilidade (focus/esc).
+=========================== */
+.user-menu{ position: relative; }
+.user-icon{
+  font-size: 28px;
+  color: #556;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+.user-menu:hover .user-icon{ transform: scale(1.06); }
+
+.user-dropdown{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 200px;
+  background: #e9f0f7;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  display: none;           /* aparece só no hover do container */
+  overflow: hidden;        /* recorta itens com bordas arredondadas */
+}
+.user-dropdown a{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  color: #222;
+  text-decoration: none;
+  font-size: 14px;
+}
+.user-dropdown a:hover{ background:#dbe7f3; }
+.user-menu:hover .user-dropdown{ display:block; }
+
+/* ===========================
+   SIDEBAR
+   - Lateral fixa abaixo da topbar, com rolagem própria.
+   - Indicador de item ativo e estado hover.
+=========================== */
+.sidebar{
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0;
+  width: var(--sidebar-w);
+  height: calc(100% - var(--topbar-h));
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 14px 10px;
+  overflow-y: auto;        /* rola independente do conteúdo principal */
+  z-index: 900;            /* abaixo da topbar */
+}
+.sidebar__section-title{
+  font-size: 12px;
+  letter-spacing: .6px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 8px 12px;
+  margin-top: 6px;
+}
+.sidebar__separator{
+  height: 1px;
+  background: var(--border);
+  margin: 8px 10px 10px;
+}
+.sidebar__nav{ display:grid; gap:6px; }
+.sidebar__link{
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px 1fr; /* ícone + texto */
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color:#1f2937;
+  font-size: 15px;
+  border-radius: 10px;
+  transition: background .14s ease, transform .06s ease, color .12s ease;
+}
+.sidebar__indicator{
+  /* barra vertical colorida ao lado do item ativo */
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  border-radius: 4px;
+  background: transparent;
+  transition: background .12s ease;
+}
+.sidebar__link i{ font-size: 18px; color: var(--brand); }
+.sidebar__text{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar__link:hover{ background: var(--hover); transform: translateX(1px); }
+.sidebar__link.is-active{
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 1px #d8e7ff;
+  color: var(--brand-ink);
+}
+.sidebar__link.is-active i{ color: var(--brand-ink); }
+.sidebar__link.is-active .sidebar__indicator{ background: var(--brand); }
+
+/* Scrollbar apenas para navegadores WebKit (não quebra nos demais) */
+.sidebar::-webkit-scrollbar{ width:8px; }
+.sidebar::-webkit-scrollbar-thumb{ background:#d7dbe2; border-radius:8px; }
+.sidebar:hover::-webkit-scrollbar-thumb{ background:#c7cdd6; }
+
+/* ===========================
+   CONTEÚDO
+   - Margens compensam as áreas fixas (topbar + sidebar).
+=========================== */
+.content{
+  margin-top: var(--topbar-h);
+  margin-left: var(--sidebar-w);
+  width: calc(100% - var(--sidebar-w));
+  min-height: calc(100vh - var(--topbar-h));
+  padding: 40px;
+}
+.page-title{
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: .4px;
+  margin-bottom: 18px;
+}
+
+/* ===========================
+   CARDS / KPIs
+   - Grade responsiva com min 300px por cartão.
+=========================== */
+.cards{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  margin: 24px 0 40px;
+}
+.card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 30px;
+  text-align: center;
+}
+.card h3{ font-size:20px; font-weight:700; margin-bottom:12px; }
+.card .kpi{ font-size:22px; font-weight:600; color: var(--brand); }
+
+/* ===========================
+   RODAPÉ
+=========================== */
+.footer{
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 18px 0 8px;
+}
+
+/* ===========================
+   MODO COMPACTO
+   - Ativado adicionando .sidebar-compact no <body>.
+   - Esconde textos e reduz a largura da sidebar para ícones.
+=========================== */
+body.sidebar-compact .sidebar{ width: 72px; }
+body.sidebar-compact .content{
+  margin-left: 72px;
+  width: calc(100% - 72px);
+}
+body.sidebar-compact .sidebar__section-title,
+body.sidebar-compact .sidebar__separator,
+body.sidebar-compact .sidebar__text{ display: none; }
+body.sidebar-compact .sidebar__link{
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 12px 0;
+}
+body.sidebar-compact .sidebar__link i{ font-size: 20px; }
+
+/* ===========================
+   RESPONSIVO
+   - Em telas estreitas, esconde sidebar fixa e expande conteúdo.
+=========================== */
+@media (max-width: 820px){
+  .sidebar{ display:none; }
+  .content{
+    margin-left: 0;
+    width: 100%;
+    padding: 24px;
+  }
+}
+
+/* ===========================
+   CENTRALIZAÇÃO & AÇÕES
+   - Wrapper para páginas de listagem/formulários.
+=========================== */
+.page-wrapper{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  width: 100%;     /* ocupa toda largura disponível */
+  max-width: none; /* remove limite para tabelas largas */
+  margin: 0;       /* sem centralização automática */
+}
+
+.page-actions{
+  display:flex; justify-content:flex-end; margin-bottom:14px;
+}
+.form-inline .input{
+  height:44px; border-radius:10px; border:1px solid var(--border);
+  padding:0 12px; font-size:15px;
+}
+
+/* ===========================
+   TABELA BASE
+   - Thead sticky para manter cabeçalho visível na rolagem.
+   - Listrado alternado e hover leve no tbody.
+=========================== */
+.table-wrapper{
+  background:#fff; border:1px solid var(--border);
+  border-radius:12px; box-shadow: var(--shadow);
+  overflow:hidden; overflow-x:auto; /* rolagem horizontal para muitas colunas */
+}
+.table{
+  width:100%; border-collapse:separate; border-spacing:0; min-width:860px;
+}
+.table thead th{
+  position:sticky; top:0; z-index:1; background:#f8fafc;
+  color:#0f172a; text-align:left; font-size:12px; font-weight:800;
+  letter-spacing:.3px; text-transform:uppercase;
+  border-bottom:1px solid var(--border); padding:12px 14px; white-space:nowrap;
+}
+.table tbody td{
+  padding:14px; border-bottom:1px solid var(--border);
+  vertical-align:middle; font-size:15px;
+}
+.table tbody tr:nth-child(odd){ background:#fafafa; }
+.table tbody tr:hover{ background:#f3f4f6; }
+.td-tight{ white-space:nowrap; }                       /* não quebra (datas, CPF, etc.) */
+.td-actions{ width:150px; white-space:nowrap; text-align:right; } /* coluna de ações */
+
+/* BOTÕES DE AÇÃO (ícones editar/excluir na tabela) */
+.btn-table{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:8px;
+  font-size:14px; color:#fff; margin-left:6px;
+}
+.btn-table.edit{ background: var(--brand); }
+.btn-table.delete{ background:#dc2626; }
+.btn-table:hover{ filter:brightness(1.1); }
+
+/* DISPONIBILIDADE (linhas de horários, textos secundários) */
+.disp-line{ line-height:1.5; }
+.muted{ color:#6b7280; }
+
+/* Botões base (lista/busca) */
+.btn{
+  height:44px; padding:0 16px; border:none; border-radius:10px;
+  background:#eef2f7; color:#111; cursor:pointer; font-weight:600;
+}
+.btn-primary{ background: var(--brand); color:#fff; }
